@@ -45,17 +45,17 @@ class PathExpr;
 
 // rust-path.h
 class PathIdentSegment;
-struct GenericArgsBinding;
+class GenericArgsBinding;
 class GenericArgs;
 class PathExprSegment;
 class PathPattern;
 class PathInExpression;
 class TypePathSegment;
 class TypePathSegmentGeneric;
-struct TypePathFunction;
+class TypePathFunction;
 class TypePathSegmentFunction;
 class TypePath;
-struct QualifiedPathType;
+class QualifiedPathType;
 class QualifiedPathInExpression;
 class QualifiedPathInType;
 
@@ -117,12 +117,8 @@ class WhileLetLoopExpr;
 class ForLoopExpr;
 class IfExpr;
 class IfExprConseqElse;
-class IfExprConseqIf;
 class IfLetExpr;
-class IfExprConseqIfLet;
 class IfLetExprConseqElse;
-class IfLetExprConseqIf;
-class IfLetExprConseqIfLet;
 struct MatchArm;
 // class MatchCase;
 // class MatchCaseBlockExpr;

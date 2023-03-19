@@ -500,23 +500,6 @@ ConstChecker::visit (IfExprConseqElse &expr)
 }
 
 void
-ConstChecker::visit (IfExprConseqIf &expr)
-{
-  expr.get_if_condition ()->accept_vis (*this);
-  expr.get_if_block ()->accept_vis (*this);
-  expr.get_conseq_if_expr ()->accept_vis (*this);
-}
-
-void
-ConstChecker::visit (IfExprConseqIfLet &expr)
-{
-  expr.get_if_condition ()->accept_vis (*this);
-  expr.get_if_block ()->accept_vis (*this);
-
-  // TODO: Visit conseq if let expression
-}
-
-void
 ConstChecker::visit (IfLetExpr &expr)
 {
   expr.get_scrutinee_expr ()->accept_vis (*this);
@@ -530,22 +513,6 @@ ConstChecker::visit (IfLetExprConseqElse &expr)
   expr.get_if_block ()->accept_vis (*this);
 
   // TODO: Visit else expression
-}
-
-void
-ConstChecker::visit (IfLetExprConseqIf &expr)
-{
-  expr.get_scrutinee_expr ()->accept_vis (*this);
-  expr.get_if_block ()->accept_vis (*this);
-}
-
-void
-ConstChecker::visit (IfLetExprConseqIfLet &expr)
-{
-  expr.get_scrutinee_expr ()->accept_vis (*this);
-  expr.get_if_block ()->accept_vis (*this);
-
-  // TODO: Visit conseq if let expression
 }
 
 void

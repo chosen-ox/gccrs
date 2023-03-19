@@ -1525,27 +1525,7 @@ IfExprConseqElse::as_string () const
 {
   std::string str = IfExpr::as_string ();
 
-  str += "\n Else block expr: " + else_block->as_string ();
-
-  return str;
-}
-
-std::string
-IfExprConseqIf::as_string () const
-{
-  std::string str = IfExpr::as_string ();
-
-  str += "\n Else if expr: \n  " + conseq_if_expr->as_string ();
-
-  return str;
-}
-
-std::string
-IfExprConseqIfLet::as_string () const
-{
-  std::string str = IfExpr::as_string ();
-
-  str += "\n Else if let expr: \n  " + if_let_expr->as_string ();
+  str += "\n Else expr: " + else_block->as_string ();
 
   return str;
 }
@@ -1580,27 +1560,7 @@ IfLetExprConseqElse::as_string () const
 {
   std::string str = IfLetExpr::as_string ();
 
-  str += "\n Else block expr: " + else_block->as_string ();
-
-  return str;
-}
-
-std::string
-IfLetExprConseqIf::as_string () const
-{
-  std::string str = IfLetExpr::as_string ();
-
-  str += "\n Else if expr: \n  " + if_expr->as_string ();
-
-  return str;
-}
-
-std::string
-IfLetExprConseqIfLet::as_string () const
-{
-  std::string str = IfLetExpr::as_string ();
-
-  str += "\n Else if let expr: \n  " + if_let_expr->as_string ();
+  str += "\n Else expr: " + else_block->as_string ();
 
   return str;
 }
@@ -2405,6 +2365,19 @@ SlicePattern::as_string () const
   std::string str ("SlicePattern: ");
 
   for (const auto &pattern : items)
+    {
+      str += "\n " + pattern->as_string ();
+    }
+
+  return str;
+}
+
+std::string
+AltPattern::as_string () const
+{
+  std::string str ("AltPattern: ");
+
+  for (const auto &pattern : alts)
     {
       str += "\n " + pattern->as_string ();
     }
@@ -4125,18 +4098,6 @@ IfExprConseqElse::accept_vis (HIRFullVisitor &vis)
 }
 
 void
-IfExprConseqIf::accept_vis (HIRFullVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-IfExprConseqIfLet::accept_vis (HIRFullVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
 IfLetExpr::accept_vis (HIRFullVisitor &vis)
 {
   vis.visit (*this);
@@ -4144,18 +4105,6 @@ IfLetExpr::accept_vis (HIRFullVisitor &vis)
 
 void
 IfLetExprConseqElse::accept_vis (HIRFullVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-IfLetExprConseqIf::accept_vis (HIRFullVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-IfLetExprConseqIfLet::accept_vis (HIRFullVisitor &vis)
 {
   vis.visit (*this);
 }
@@ -4474,6 +4423,12 @@ TuplePattern::accept_vis (HIRFullVisitor &vis)
 
 void
 SlicePattern::accept_vis (HIRFullVisitor &vis)
+{
+  vis.visit (*this);
+}
+
+void
+AltPattern::accept_vis (HIRFullVisitor &vis)
 {
   vis.visit (*this);
 }
@@ -4809,6 +4764,12 @@ SlicePattern::accept_vis (HIRPatternVisitor &vis)
 }
 
 void
+AltPattern::accept_vis (HIRPatternVisitor &vis)
+{
+  vis.visit (*this);
+}
+
+void
 RangePattern::accept_vis (HIRPatternVisitor &vis)
 {
   vis.visit (*this);
@@ -4899,18 +4860,6 @@ RangeFromToInclExpr::accept_vis (HIRExpressionVisitor &vis)
 }
 
 void
-IfLetExprConseqIfLet::accept_vis (HIRExpressionVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-IfLetExprConseqIf::accept_vis (HIRExpressionVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
 IfLetExprConseqElse::accept_vis (HIRExpressionVisitor &vis)
 {
   vis.visit (*this);
@@ -4918,18 +4867,6 @@ IfLetExprConseqElse::accept_vis (HIRExpressionVisitor &vis)
 
 void
 IfLetExpr::accept_vis (HIRExpressionVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-IfExprConseqIfLet::accept_vis (HIRExpressionVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-IfExprConseqIf::accept_vis (HIRExpressionVisitor &vis)
 {
   vis.visit (*this);
 }

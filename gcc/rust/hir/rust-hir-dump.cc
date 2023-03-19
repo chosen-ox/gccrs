@@ -361,22 +361,10 @@ void
 Dump::visit (IfExprConseqElse &)
 {}
 void
-Dump::visit (IfExprConseqIf &)
-{}
-void
-Dump::visit (IfExprConseqIfLet &)
-{}
-void
 Dump::visit (IfLetExpr &)
 {}
 void
 Dump::visit (IfLetExprConseqElse &)
-{}
-void
-Dump::visit (IfLetExprConseqIf &)
-{}
-void
-Dump::visit (IfLetExprConseqIfLet &)
 {}
 
 void

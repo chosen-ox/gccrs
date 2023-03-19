@@ -81,12 +81,8 @@ public:
   virtual void visit (ForLoopExpr &expr) = 0;
   virtual void visit (IfExpr &expr) = 0;
   virtual void visit (IfExprConseqElse &expr) = 0;
-  virtual void visit (IfExprConseqIf &expr) = 0;
-  virtual void visit (IfExprConseqIfLet &expr) = 0;
   virtual void visit (IfLetExpr &expr) = 0;
   virtual void visit (IfLetExprConseqElse &expr) = 0;
-  virtual void visit (IfLetExprConseqIf &expr) = 0;
-  virtual void visit (IfLetExprConseqIfLet &expr) = 0;
   virtual void visit (MatchExpr &expr) = 0;
   virtual void visit (AwaitExpr &expr) = 0;
   virtual void visit (AsyncBlockExpr &expr) = 0;
@@ -224,12 +220,8 @@ public:
   virtual void visit (ForLoopExpr &) override {}
   virtual void visit (IfExpr &) override {}
   virtual void visit (IfExprConseqElse &) override {}
-  virtual void visit (IfExprConseqIf &) override {}
-  virtual void visit (IfExprConseqIfLet &) override {}
   virtual void visit (IfLetExpr &) override {}
   virtual void visit (IfLetExprConseqElse &) override {}
-  virtual void visit (IfLetExprConseqIf &) override {}
-  virtual void visit (IfLetExprConseqIfLet &) override {}
 
   virtual void visit (MatchExpr &) override {}
   virtual void visit (AwaitExpr &) override {}
@@ -460,12 +452,8 @@ public:
   virtual void visit (ForLoopExpr &expr) = 0;
   virtual void visit (IfExpr &expr) = 0;
   virtual void visit (IfExprConseqElse &expr) = 0;
-  virtual void visit (IfExprConseqIf &expr) = 0;
-  virtual void visit (IfExprConseqIfLet &expr) = 0;
   virtual void visit (IfLetExpr &expr) = 0;
   virtual void visit (IfLetExprConseqElse &expr) = 0;
-  virtual void visit (IfLetExprConseqIf &expr) = 0;
-  virtual void visit (IfLetExprConseqIfLet &expr) = 0;
   virtual void visit (MatchExpr &expr) = 0;
   virtual void visit (AwaitExpr &expr) = 0;
   virtual void visit (AsyncBlockExpr &expr) = 0;
