@@ -95,12 +95,8 @@ public:
   void visit (AST::ForLoopExpr &expr) override {}
   void visit (AST::IfExpr &expr) override {}
   void visit (AST::IfExprConseqElse &expr) override {}
-  void visit (AST::IfExprConseqIf &expr) override {}
-  void visit (AST::IfExprConseqIfLet &expr) override {}
   void visit (AST::IfLetExpr &expr) override {}
   void visit (AST::IfLetExprConseqElse &expr) override {}
-  void visit (AST::IfLetExprConseqIf &expr) override {}
-  void visit (AST::IfLetExprConseqIfLet &expr) override {}
   void visit (AST::MatchExpr &expr) override {}
   void visit (AST::AwaitExpr &expr) override {}
   void visit (AST::AsyncBlockExpr &expr) override {}

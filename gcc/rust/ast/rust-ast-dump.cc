@@ -17,6 +17,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "rust-ast-dump.h"
+#include "rust-expr.h"
 
 namespace Rust {
 namespace AST {
@@ -487,8 +488,20 @@ Dump::visit (QualifiedPathInExpression &path)
 }
 
 void
-Dump::visit (QualifiedPathInType &)
-{}
+Dump::visit (QualifiedPathInType &path)
+{
+  auto qualified_path_type = path.get_qualified_path_type ();
+  stream << "<";
+  visit (qualified_path_type.get_type ());
+  if (qualified_path_type.has_as_clause ())
+    {
+      stream << " as ";
+      visit (qualified_path_type.get_as_type_path ());
+    }
+  stream << ">::";
+  visit (path.get_associated_segment ());
+  visit_items_joined_by_separator (path.get_segments (), "::");
+}
 
 // rust-expr.h
 void
@@ -936,35 +949,11 @@ Dump::visit (IfExprConseqElse &expr)
 }
 
 void
-Dump::visit (IfExprConseqIf &expr)
-{
-  stream << "if ";
-  visit (expr.get_condition_expr ());
-  stream << " ";
-  visit (expr.get_if_block ());
-  stream << indentation << "else ";
-  // The "if" part of the "else if" is printed by the next visitor
-  visit (expr.get_conseq_if_expr ());
-}
-
-void
-Dump::visit (IfExprConseqIfLet &)
-{}
-
-void
 Dump::visit (IfLetExpr &)
 {}
 
 void
 Dump::visit (IfLetExprConseqElse &)
-{}
-
-void
-Dump::visit (IfLetExprConseqIf &)
-{}
-
-void
-Dump::visit (IfLetExprConseqIfLet &)
 {}
 
 void
@@ -1176,7 +1165,6 @@ Dump::visit (TypeAlias &type_alias)
   // Visibility? type IDENTIFIER GenericParams? WhereClause? = Type;
 
   // Note: Associated types are handled by `AST::TraitItemType`.
-
   if (type_alias.has_visibility ())
     visit (type_alias.get_visibility ());
   stream << "type " << type_alias.get_new_type_name ();
@@ -1186,6 +1174,7 @@ Dump::visit (TypeAlias &type_alias)
     visit (type_alias.get_where_clause ());
   stream << " = ";
   visit (type_alias.get_type_aliased ());
+  stream << ";\n";
 }
 
 void
@@ -1532,7 +1521,6 @@ Dump::visit (MacroRule &rule)
   visit (rule.get_matcher ());
   stream << " => ";
   visit (rule.get_transcriber ().get_token_tree ());
-  stream << ";";
 }
 
 void
@@ -1917,5 +1905,21 @@ Dump::visit (BareFunctionType &type)
     }
 }
 
+void
+Dump::debug (Visitable &v)
+{
+  auto dump = Dump (std::cerr);
+
+  std::cerr << '\n';
+  v.accept_vis (dump);
+  std::cerr << '\n';
+}
+
 } // namespace AST
 } // namespace Rust
+
+void
+debug (Rust::AST::Visitable &v)
+{
+  Rust::AST::Dump::debug (v);
+}

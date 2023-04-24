@@ -243,6 +243,8 @@
 #undef v
 // <sys/timer.h> defines trb::func and cputime_tmr::func
 #undef func
+// <sys/thread.h> defines tstate::policy
+#undef policy
 #endif
 
 #ifdef __APPLE__
@@ -346,6 +348,8 @@
 #undef d
 #undef e
 #undef f
+// in sysLib.h, func appears as a formal parameter name
+#undef func
 #endif // __RTP__
 
 #endif // VxWorks Major >= 7

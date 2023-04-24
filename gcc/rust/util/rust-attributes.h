@@ -160,12 +160,8 @@ private:
   void visit (AST::ForLoopExpr &expr);
   void visit (AST::IfExpr &expr);
   void visit (AST::IfExprConseqElse &expr);
-  void visit (AST::IfExprConseqIf &expr);
-  void visit (AST::IfExprConseqIfLet &expr);
   void visit (AST::IfLetExpr &expr);
   void visit (AST::IfLetExprConseqElse &expr);
-  void visit (AST::IfLetExprConseqIf &expr);
-  void visit (AST::IfLetExprConseqIfLet &expr);
   void visit (AST::MatchExpr &expr);
   void visit (AST::AwaitExpr &expr);
   void visit (AST::AsyncBlockExpr &expr);

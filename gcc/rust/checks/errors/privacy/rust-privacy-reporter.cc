@@ -201,7 +201,7 @@ PrivacyReporter::check_base_type_privacy (Analysis::NodeMapping &node_mappings,
     case TyTy::INFER:
       return;
     case TyTy::ERROR:
-      rust_unreachable ();
+      return;
     }
 }
 
@@ -717,20 +717,10 @@ PrivacyReporter::visit (HIR::LetStmt &stmt)
 }
 
 void
-PrivacyReporter::visit (HIR::ExprStmtWithoutBlock &stmt)
+PrivacyReporter::visit (HIR::ExprStmt &stmt)
 {
   stmt.get_expr ()->accept_vis (*this);
 }
-
-void
-PrivacyReporter::visit (HIR::ExprStmtWithBlock &stmt)
-{
-  stmt.get_expr ()->accept_vis (*this);
-}
-
-void
-PrivacyReporter::visit (HIR::ExportedMacro &)
-{}
 
 } // namespace Privacy
 } // namespace Rust

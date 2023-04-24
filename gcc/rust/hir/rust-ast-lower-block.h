@@ -101,8 +101,6 @@ public:
 
   void visit (AST::IfExprConseqElse &expr) override;
 
-  void visit (AST::IfExprConseqIf &expr) override;
-
 private:
   ASTLoweringIfBlock ()
     : ASTLoweringBase (), translated (nullptr), terminated (false)
@@ -131,6 +129,8 @@ public:
   ~ASTLoweringIfLetBlock () {}
 
   void visit (AST::IfLetExpr &expr) override;
+
+  void visit (AST::IfLetExprConseqElse &expr) override;
 
 private:
   ASTLoweringIfLetBlock () : ASTLoweringBase (), translated (nullptr) {}
@@ -169,12 +169,12 @@ public:
     translated = ASTLoweringIfBlock::translate (&expr, &terminated);
   }
 
-  void visit (AST::IfExprConseqIf &expr) override
+  void visit (AST::IfLetExpr &expr) override
   {
-    translated = ASTLoweringIfBlock::translate (&expr, &terminated);
+    translated = ASTLoweringIfLetBlock::translate (&expr);
   }
 
-  void visit (AST::IfLetExpr &expr) override
+  void visit (AST::IfLetExprConseqElse &expr) override
   {
     translated = ASTLoweringIfLetBlock::translate (&expr);
   }

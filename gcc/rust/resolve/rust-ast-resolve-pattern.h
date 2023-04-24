@@ -90,31 +90,6 @@ public:
 
 typedef std::map<Identifier, BindingTypeInfo> BindingMap;
 
-class ResolvePattern : public ResolverBase
-{
-  using Rust::Resolver::ResolverBase::visit;
-
-public:
-  static void go (AST::Pattern *pattern)
-  {
-    ResolvePattern resolver;
-    pattern->accept_vis (resolver);
-  }
-
-  void visit (AST::IdentifierPattern &pattern) override
-  {
-    if (resolver->get_name_scope ().lookup (
-	  CanonicalPath::new_seg (pattern.get_node_id (), pattern.get_ident ()),
-	  &resolved_node))
-      {
-	resolver->insert_resolved_name (pattern.get_node_id (), resolved_node);
-      }
-  }
-
-private:
-  ResolvePattern () : ResolverBase () {}
-};
-
 class PatternDeclaration : public ResolverBase
 {
   using Rust::Resolver::ResolverBase::visit;
@@ -133,6 +108,7 @@ public:
   void visit (AST::TuplePattern &pattern) override;
   void visit (AST::RangePattern &pattern) override;
   void visit (AST::AltPattern &pattern) override;
+  void visit (AST::SlicePattern &pattern) override;
 
   void add_new_binding (Identifier ident, NodeId node_id, BindingTypeInfo info);
   void check_bindings_consistency (std::vector<BindingMap> &binding_maps);

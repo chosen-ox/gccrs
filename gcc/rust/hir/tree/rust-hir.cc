@@ -1075,9 +1075,9 @@ PathInExpression::as_string () const
 }
 
 std::string
-ExprStmtWithBlock::as_string () const
+ExprStmt::as_string () const
 {
-  std::string str = indent_spaces (enter) + "ExprStmtWithBlock: \n";
+  std::string str = indent_spaces (enter) + "ExprStmt:\n";
 
   if (expr == nullptr)
     {
@@ -1937,26 +1937,6 @@ TupleExpr::as_string () const
 	  str += "\n  " + elem->as_string ();
 	}
     }
-
-  return str;
-}
-
-std::string
-ExprStmtWithoutBlock::as_string () const
-{
-  std::string str ("ExprStmtWithoutBlock:\n");
-  indent_spaces (enter);
-  str += indent_spaces (stay);
-
-  if (expr == nullptr)
-    {
-      str += "none (this shouldn't happen and is probably an error)";
-    }
-  else
-    {
-      str += expr->as_string ();
-    }
-  indent_spaces (out);
 
   return str;
 }
@@ -4446,13 +4426,7 @@ LetStmt::accept_vis (HIRFullVisitor &vis)
 }
 
 void
-ExprStmtWithoutBlock::accept_vis (HIRFullVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-ExprStmtWithBlock::accept_vis (HIRFullVisitor &vis)
+ExprStmt::accept_vis (HIRFullVisitor &vis)
 {
   vis.visit (*this);
 }
@@ -4794,7 +4768,7 @@ QualifiedPathInType::accept_vis (HIRTypeVisitor &vis)
 }
 
 void
-ExprStmtWithoutBlock::accept_vis (HIRStmtVisitor &vis)
+ExprStmt::accept_vis (HIRStmtVisitor &vis)
 {
   vis.visit (*this);
 }
@@ -4969,12 +4943,6 @@ ReturnExpr::accept_vis (HIRExpressionVisitor &vis)
 
 void
 QualifiedPathInExpression::accept_vis (HIRPatternVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-ExprStmtWithBlock::accept_vis (HIRStmtVisitor &vis)
 {
   vis.visit (*this);
 }
@@ -5179,42 +5147,6 @@ ConstGenericParam::as_string () const
 void
 ConstGenericParam::accept_vis (HIRFullVisitor &)
 {}
-
-void
-ExportedMacro::accept_vis (HIRVisItemVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-ExportedMacro::accept_vis (HIRFullVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-void
-ExportedMacro::accept_vis (HIRStmtVisitor &vis)
-{
-  vis.visit (*this);
-}
-
-Location
-ExportedMacro::get_locus () const
-{
-  return locus;
-}
-
-Item::ItemKind
-ExportedMacro::get_item_kind () const
-{
-  return ItemKind::MacroExport;
-}
-
-ExportedMacro *
-ExportedMacro::clone_item_impl () const
-{
-  return new ExportedMacro (*this);
-}
 
 } // namespace HIR
 } // namespace Rust

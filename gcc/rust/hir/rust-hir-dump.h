@@ -165,8 +165,7 @@ private:
 
   virtual void visit (EmptyStmt &) override;
   virtual void visit (LetStmt &) override;
-  virtual void visit (ExprStmtWithoutBlock &) override;
-  virtual void visit (ExprStmtWithBlock &) override;
+  virtual void visit (ExprStmt &) override;
 
   virtual void visit (TraitBound &) override;
   virtual void visit (ImplTraitType &) override;
@@ -181,7 +180,6 @@ private:
   virtual void visit (SliceType &) override;
   virtual void visit (InferredType &) override;
   virtual void visit (BareFunctionType &) override;
-  virtual void visit (ExportedMacro &) override;
 };
 
 } // namespace HIR

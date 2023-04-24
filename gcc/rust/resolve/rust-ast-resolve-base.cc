@@ -295,27 +295,11 @@ ResolverBase::visit (AST::IfExprConseqElse &)
 {}
 
 void
-ResolverBase::visit (AST::IfExprConseqIf &)
-{}
-
-void
-ResolverBase::visit (AST::IfExprConseqIfLet &)
-{}
-
-void
 ResolverBase::visit (AST::IfLetExpr &)
 {}
 
 void
 ResolverBase::visit (AST::IfLetExprConseqElse &)
-{}
-
-void
-ResolverBase::visit (AST::IfLetExprConseqIf &)
-{}
-
-void
-ResolverBase::visit (AST::IfLetExprConseqIfLet &)
 {}
 
 void

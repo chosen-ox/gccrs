@@ -484,7 +484,7 @@ Parser<ManagedTokenSource>::parse_inner_attributes ()
 
 // Parse a inner or outer doc comment into an doc attribute
 template <typename ManagedTokenSource>
-AST::Attribute
+std::tuple<AST::SimplePath, std::unique_ptr<AST::AttrInput>, Location>
 Parser<ManagedTokenSource>::parse_doc_comment ()
 {
   const_TokenPtr token = lexer.peek_token ();
@@ -498,7 +498,7 @@ Parser<ManagedTokenSource>::parse_doc_comment ()
   std::unique_ptr<AST::AttrInput> attr_input (
     new AST::AttrInputLiteral (std::move (lit_expr)));
   lexer.skip_token ();
-  return AST::Attribute (std::move (attr_path), std::move (attr_input), locus);
+  return std::make_tuple (std::move (attr_path), std::move (attr_input), locus);
 }
 
 // Parse a single inner attribute.
@@ -507,7 +507,13 @@ AST::Attribute
 Parser<ManagedTokenSource>::parse_inner_attribute ()
 {
   if (lexer.peek_token ()->get_id () == INNER_DOC_COMMENT)
-    return parse_doc_comment ();
+    {
+      auto values = parse_doc_comment ();
+      auto path = std::move (std::get<0> (values));
+      auto input = std::move (std::get<1> (values));
+      auto loc = std::get<2> (values);
+      return AST::Attribute (std::move (path), std::move (input), loc, true);
+    }
 
   if (lexer.peek_token ()->get_id () != HASH)
     {
@@ -533,7 +539,13 @@ Parser<ManagedTokenSource>::parse_inner_attribute ()
   if (!skip_token (LEFT_SQUARE))
     return AST::Attribute::create_empty ();
 
-  AST::Attribute actual_attribute = parse_attribute_body ();
+  auto values = parse_attribute_body ();
+
+  auto path = std::move (std::get<0> (values));
+  auto input = std::move (std::get<1> (values));
+  auto loc = std::get<2> (values);
+  auto actual_attribute
+    = AST::Attribute (std::move (path), std::move (input), loc, true);
 
   if (!skip_token (RIGHT_SQUARE))
     return AST::Attribute::create_empty ();
@@ -543,7 +555,7 @@ Parser<ManagedTokenSource>::parse_inner_attribute ()
 
 // Parses the body of an attribute (inner or outer).
 template <typename ManagedTokenSource>
-AST::Attribute
+std::tuple<AST::SimplePath, std::unique_ptr<AST::AttrInput>, Location>
 Parser<ManagedTokenSource>::parse_attribute_body ()
 {
   Location locus = lexer.peek_token ()->get_locus ();
@@ -558,13 +570,13 @@ Parser<ManagedTokenSource>::parse_attribute_body ()
 
       // Skip past potential further info in attribute (i.e. attr_input)
       skip_after_end_attribute ();
-      return AST::Attribute::create_empty ();
+      return std::make_tuple (std::move (attr_path), nullptr, Location ());
     }
 
   std::unique_ptr<AST::AttrInput> attr_input = parse_attr_input ();
   // AttrInput is allowed to be null, so no checks here
 
-  return AST::Attribute (std::move (attr_path), std::move (attr_input), locus);
+  return std::make_tuple (std::move (attr_path), std::move (attr_input), locus);
 }
 
 /* Determines whether token is a valid simple path segment. This does not
@@ -1161,7 +1173,13 @@ AST::Attribute
 Parser<ManagedTokenSource>::parse_outer_attribute ()
 {
   if (lexer.peek_token ()->get_id () == OUTER_DOC_COMMENT)
-    return parse_doc_comment ();
+    {
+      auto values = parse_doc_comment ();
+      auto path = std::move (std::get<0> (values));
+      auto input = std::move (std::get<1> (values));
+      auto loc = std::get<2> (values);
+      return AST::Attribute (std::move (path), std::move (input), loc, false);
+    }
 
   if (lexer.peek_token ()->get_id () == INNER_DOC_COMMENT)
     {
@@ -1199,7 +1217,12 @@ Parser<ManagedTokenSource>::parse_outer_attribute ()
 
   lexer.skip_token ();
 
-  AST::Attribute actual_attribute = parse_attribute_body ();
+  auto values = parse_attribute_body ();
+  auto path = std::move (std::get<0> (values));
+  auto input = std::move (std::get<1> (values));
+  auto loc = std::get<2> (values);
+  auto actual_attribute
+    = AST::Attribute (std::move (path), std::move (input), loc, false);
 
   if (lexer.peek_token ()->get_id () != RIGHT_SQUARE)
     return AST::Attribute::create_empty ();
@@ -2058,6 +2081,7 @@ Parser<ManagedTokenSource>::parse_macro_match ()
 	  case WHILE:
 	  case YIELD:
 	  case IDENTIFIER:
+	  case UNDERSCORE:
 	    // macro fragment
 	    return parse_macro_match_fragment ();
 	  case LEFT_PAREN:
@@ -2237,6 +2261,16 @@ Parser<ManagedTokenSource>::parse_macro_match_repetition ()
     case QUESTION_MARK:
       op = AST::MacroMatchRepetition::ZERO_OR_ONE;
       lexer.skip_token ();
+
+      if (separator != nullptr)
+	{
+	  add_error (
+	    Error (separator->get_locus (),
+		   "the %<?%> macro repetition operator does not take a "
+		   "separator"));
+	  separator = nullptr;
+	}
+
       break;
     default:
       add_error (
@@ -7449,9 +7483,6 @@ Parser<ManagedTokenSource>::parse_expr_without_block (
     case MOVE:
       // closure expr (though not all closure exprs require this)
       return parse_closure_expr (std::move (outer_attrs));
-    case LEFT_SQUARE:
-      // array expr (creation, not index)
-      return parse_array_expr (std::move (outer_attrs));
       default: {
 	/* HACK: piggyback on pratt parsed expr and abuse polymorphism to
 	 * essentially downcast */
@@ -8015,11 +8046,11 @@ Parser<ManagedTokenSource>::parse_if_expr (AST::AttrVec outer_attrs,
 		    return nullptr;
 		  }
 
-		return std::unique_ptr<AST::IfExprConseqIfLet> (
-		  new AST::IfExprConseqIfLet (std::move (condition),
-					      std::move (if_body),
-					      std::move (if_let_expr),
-					      std::move (outer_attrs), locus));
+		return std::unique_ptr<AST::IfExprConseqElse> (
+		  new AST::IfExprConseqElse (std::move (condition),
+					     std::move (if_body),
+					     std::move (if_let_expr),
+					     std::move (outer_attrs), locus));
 	      }
 	    else
 	      {
@@ -8036,11 +8067,11 @@ Parser<ManagedTokenSource>::parse_if_expr (AST::AttrVec outer_attrs,
 		    return nullptr;
 		  }
 
-		return std::unique_ptr<AST::IfExprConseqIf> (
-		  new AST::IfExprConseqIf (std::move (condition),
-					   std::move (if_body),
-					   std::move (if_expr),
-					   std::move (outer_attrs), locus));
+		return std::unique_ptr<AST::IfExprConseqElse> (
+		  new AST::IfExprConseqElse (std::move (condition),
+					     std::move (if_body),
+					     std::move (if_expr),
+					     std::move (outer_attrs), locus));
 	      }
 	  }
 	default:
@@ -8198,8 +8229,8 @@ Parser<ManagedTokenSource>::parse_if_let_expr (AST::AttrVec outer_attrs,
 		    return nullptr;
 		  }
 
-		return std::unique_ptr<AST::IfLetExprConseqIfLet> (
-		  new AST::IfLetExprConseqIfLet (
+		return std::unique_ptr<AST::IfLetExprConseqElse> (
+		  new AST::IfLetExprConseqElse (
 		    std::move (match_arm_patterns), std::move (scrutinee_expr),
 		    std::move (if_let_body), std::move (if_let_expr),
 		    std::move (outer_attrs), locus));
@@ -8219,12 +8250,11 @@ Parser<ManagedTokenSource>::parse_if_let_expr (AST::AttrVec outer_attrs,
 		    return nullptr;
 		  }
 
-		return std::unique_ptr<AST::IfLetExprConseqIf> (
-		  new AST::IfLetExprConseqIf (std::move (match_arm_patterns),
-					      std::move (scrutinee_expr),
-					      std::move (if_let_body),
-					      std::move (if_expr),
-					      std::move (outer_attrs), locus));
+		return std::unique_ptr<AST::IfLetExprConseqElse> (
+		  new AST::IfLetExprConseqElse (
+		    std::move (match_arm_patterns), std::move (scrutinee_expr),
+		    std::move (if_let_body), std::move (if_expr),
+		    std::move (outer_attrs), locus));
 	      }
 	  }
 	default:
@@ -10919,7 +10949,7 @@ Parser<ManagedTokenSource>::parse_reference_pattern ()
     }
 
   // parse pattern to get reference of (required)
-  std::unique_ptr<AST::Pattern> pattern = parse_pattern ();
+  std::unique_ptr<AST::Pattern> pattern = parse_pattern_no_alt ();
   if (pattern == nullptr)
     {
       Error error (lexer.peek_token ()->get_locus (),
@@ -15158,14 +15188,5 @@ Parser<ManagedTokenSource>::done_end ()
 {
   const_TokenPtr t = lexer.peek_token ();
   return (t->get_id () == RIGHT_CURLY || t->get_id () == END_OF_FILE);
-}
-
-// Parses crate and dumps AST to stderr, recursively.
-template <typename ManagedTokenSource>
-void
-Parser<ManagedTokenSource>::debug_dump_ast_output (AST::Crate &crate,
-						   std::ostream &out)
-{
-  out << crate.as_string ();
 }
 } // namespace Rust

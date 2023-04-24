@@ -21,7 +21,6 @@
 
 #include "rust-ast-resolve-base.h"
 #include "rust-ast-resolve-pattern.h"
-#include "rust-ast-full.h"
 
 namespace Rust {
 namespace Resolver {
@@ -32,7 +31,8 @@ class ResolveExpr : public ResolverBase
 
 public:
   static void go (AST::Expr *expr, const CanonicalPath &prefix,
-		  const CanonicalPath &canonical_prefix);
+		  const CanonicalPath &canonical_prefix,
+		  bool funny_error = false);
 
   void visit (AST::TupleIndexExpr &expr) override;
   void visit (AST::TupleExpr &expr) override;
@@ -51,8 +51,8 @@ public:
   void visit (AST::TypeCastExpr &expr) override;
   void visit (AST::IfExpr &expr) override;
   void visit (AST::IfExprConseqElse &expr) override;
-  void visit (AST::IfExprConseqIf &expr) override;
   void visit (AST::IfLetExpr &expr) override;
+  void visit (AST::IfLetExprConseqElse &expr) override;
   void visit (AST::BlockExpr &expr) override;
   void visit (AST::UnsafeBlockExpr &expr) override;
   void visit (AST::ArrayElemsValues &elems) override;
@@ -85,10 +85,11 @@ protected:
 
 private:
   ResolveExpr (const CanonicalPath &prefix,
-	       const CanonicalPath &canonical_prefix);
+	       const CanonicalPath &canonical_prefix, bool funny_error);
 
   const CanonicalPath &prefix;
   const CanonicalPath &canonical_prefix;
+  bool funny_error;
 };
 
 } // namespace Resolver

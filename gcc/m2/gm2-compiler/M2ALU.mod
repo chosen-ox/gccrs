@@ -67,7 +67,8 @@ FROM m2expr IMPORT BuildAdd, BuildSub, BuildMult,
                    BuildDivTrunc, BuildModTrunc, BuildDivFloor, BuildModFloor,
                    BuildLSL, BuildLSR,
                    BuildLogicalOr, BuildLogicalAnd, BuildSymmetricDifference,
-                   GetWordOne, GetCardinalZero, TreeOverflow, RemoveOverflow ;
+                   GetWordOne, GetCardinalZero, TreeOverflow, RemoveOverflow,
+                   GetCstInteger ;
 
 FROM m2decl IMPORT GetBitsPerBitset, BuildIntegerConstant, BuildConstLiteralNumber ;
 FROM m2misc IMPORT DebugTree ;
@@ -1158,6 +1159,30 @@ END PushChar ;
 
 
 (*
+   PopChar - pops a char from the stack.
+*)
+
+PROCEDURE PopChar (tokenno: CARDINAL) : CHAR ;
+VAR
+   v : PtrToValue ;
+   ch: CHAR ;
+BEGIN
+   v := Pop () ;
+   ch := 0C ;
+   WITH v^ DO
+      IF type = integer
+      THEN
+         ch := VAL (CHAR, GetCstInteger (numberValue))
+      ELSE
+         MetaErrorT0 (tokenno, '{%E}cannot convert constant to a CHAR')
+      END
+   END ;
+   Push (v) ;
+   RETURN ch
+END PopChar ;
+
+
+(*
    IsReal - returns TRUE if a is a REAL number.
 *)
 
@@ -1171,7 +1196,7 @@ END IsReal ;
    PushString - pushes the numerical value of the string onto the stack.
 *)
 
-PROCEDURE PushString (tokenno: CARDINAL; s: Name) ;
+PROCEDURE PushString (tokenno: CARDINAL; s: Name; issueError: BOOLEAN) ;
 VAR
    ch      : CHAR ;
    a, b    : DynamicStrings.String ;
@@ -1192,26 +1217,27 @@ BEGIN
            b := DynamicStrings.Slice (a, 0, -1) ;
            PushIntegerTree (BuildConstLiteralNumber (location,
                                                      DynamicStrings.string (b),
-                                                     16)) |
+                                                     16, issueError)) |
       'A': (* binary *)
            b := DynamicStrings.Slice (a, 0, -1) ;
            PushIntegerTree (BuildConstLiteralNumber (location,
                                                      DynamicStrings.string (b),
-                                                     2)) |
+                                                     2, issueError)) |
       'C', (* --fixme-- question:
               should we type this as a char rather than an int? *)
       'B': (* octal *)
            b := DynamicStrings.Slice (a, 0, -1) ;
            PushIntegerTree (BuildConstLiteralNumber (location,
                                                      DynamicStrings.string (b),
-                                                     8))
+                                                     8, issueError))
 
       ELSE
          IF IsReal (a)
          THEN
             PushRealTree (RealToTree (KeyToCharStar (s)))
          ELSE
-            PushIntegerTree (BuildConstLiteralNumber (location, KeyToCharStar (s), 10))
+            PushIntegerTree (BuildConstLiteralNumber (location, KeyToCharStar (s),
+                                                      10, issueError))
          END
       END
    ELSE

@@ -1,3 +1,40 @@
+2023-04-15  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR bootstrap/109510
+	* gcc-interface/decl.cc (gnat_to_gnu_entity) <types>: Do not reset
+	align to zero in any case.  Set TYPE_USER_ALIGN on the type only if
+	it is an aggregate type, or else a type whose default alignment is
+	specifically capped on selected platforms.
+
+2023-04-14  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR bootstrap/109510
+	* gcc-interface/decl.cc (gnat_to_gnu_entity) <types>: Reset align
+	to zero if its value is equal to TYPE_ALIGN and the type is scalar.
+	Set TYPE_USER_ALIGN on the type only if align is positive.
+
+2023-03-06  Javier Miranda  <miranda@adacore.com>
+
+	PR ada/108858
+	* sem_ch6.adb (Analyze_Subprogram_Body_Helper): For functions with
+	separate spec, if their return type was visible through a limited-
+	with context clause, their extra formals were not added when the
+	spec was analyzed.  Now the full view must be available, and the
+	extra formals can be created and Returns_By_Ref computed.
+
+2023-03-06  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR ada/108909
+	PR ada/108983
+	* Make-generated.in: Do not use GNATMAKE.
+	* gcc-interface/Makefile.in: Ditto.
+
+2023-02-26  Peter Foley  <pefoley2@pefoley.com>
+
+	PR ada/108909
+	* Make-generated.in: Use GNATMAKE.
+	* gcc-interface/Makefile.in: Ditto.
+
 2023-02-14  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* gcc-interface/trans.cc (gnat_gimplify_expr): Add missing guard.

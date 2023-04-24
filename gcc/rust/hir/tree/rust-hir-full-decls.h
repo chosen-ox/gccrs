@@ -35,9 +35,6 @@ class Lifetime;
 class GenericParam;
 class LifetimeParam;
 
-// FIXME: ARTHUR: Move this somewhere else
-class ExportedMacro;
-
 class TraitItem;
 class ImplItem;
 struct Crate;
@@ -132,8 +129,6 @@ class AsyncBlockExpr;
 class EmptyStmt;
 class LetStmt;
 class ExprStmt;
-class ExprStmtWithoutBlock;
-class ExprStmtWithBlock;
 
 // rust-item.h
 class TypeParam;

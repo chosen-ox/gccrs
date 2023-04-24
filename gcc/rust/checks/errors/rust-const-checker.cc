@@ -821,13 +821,7 @@ ConstChecker::visit (LetStmt &stmt)
 }
 
 void
-ConstChecker::visit (ExprStmtWithoutBlock &stmt)
-{
-  stmt.get_expr ()->accept_vis (*this);
-}
-
-void
-ConstChecker::visit (ExprStmtWithBlock &stmt)
+ConstChecker::visit (ExprStmt &stmt)
 {
   stmt.get_expr ()->accept_vis (*this);
 }
@@ -892,10 +886,6 @@ ConstChecker::visit (InferredType &)
 
 void
 ConstChecker::visit (BareFunctionType &)
-{}
-
-void
-ConstChecker::visit (ExportedMacro &)
 {}
 
 } // namespace HIR

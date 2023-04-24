@@ -36,13 +36,7 @@ TypeCheckStmt::Resolve (HIR::Stmt *stmt)
 }
 
 void
-TypeCheckStmt::visit (HIR::ExprStmtWithBlock &stmt)
-{
-  infered = TypeCheckExpr::Resolve (stmt.get_expr ());
-}
-
-void
-TypeCheckStmt::visit (HIR::ExprStmtWithoutBlock &stmt)
+TypeCheckStmt::visit (HIR::ExprStmt &stmt)
 {
   infered = TypeCheckExpr::Resolve (stmt.get_expr ());
 }
@@ -146,10 +140,6 @@ TypeCheckStmt::visit (HIR::QualifiedPathInType &path)
 {
   infered = TypeCheckType::Resolve (&path);
 }
-
-void
-TypeCheckStmt::visit (HIR::ExportedMacro &path)
-{}
 
 void
 TypeCheckStmt::visit (HIR::TupleStruct &struct_decl)

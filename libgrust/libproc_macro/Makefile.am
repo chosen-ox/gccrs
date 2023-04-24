@@ -51,7 +51,13 @@ AM_MAKEFLAGS = \
 toolexeclib_LTLIBRARIES = libproc_macro.la
 
 libproc_macro_la_SOURCES = \
-	proc_macro.cc
+	proc_macro.cc \
+	ident.cc \
+	punct.cc \
+	group.cc \
+	tokentree.cc \
+	tokenstream.cc \
+	literal.cc
 
 include_HEADERS = \
 	proc_macro.h
